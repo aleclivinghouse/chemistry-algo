@@ -38,29 +38,28 @@ Molecule.prototype.contains = function(name){
 /////////////////////////////////////////////////////
 
  // let data = "1C6H12O6+6O2=6Co2+6H2O";
-let data = '2FeCl3+MgO=Fe2O3+MgCl2'
+let thingy = '2FeCl3+MgO=Fe2O3+MgCl2';
+function stringToJSON(data){
+
 let sides = data.split("=");
 let leftMolecules = sides[0].split("+");
 let rightMolecules = sides[1].split("+");
-
+let coCount = 1;
 function sideToJSON(side){
   let arr = [];
    let theSide = new Side();
-   for(molecule of side){
+   for(let molecule of side){
     let arr = [];
     let capitalRegex = /[A-Z]/;
     let lowerCaseRegex = /[a-z]/;
     let numRegex = /[0-9]/;
-    let co = parseInt(molecule[0]);
-    if(numRegex.test(co)===false){
-      co = 1;
-    }
-    let theMolecule = new Molecule(co);
+    let letter = num2Letter(coCount);
+    let theMolecule = new Molecule(letter);
+    coCount++;
 
+    let rest = molecule;
 
-    let rest = molecule.substr(1);
-
-    for(let j = 0; j<rest.length-1; j++){
+    for(let j = 0; j<rest.length; j++){
       //if the char is a capital letter
       if(capitalRegex.test(rest[j]) === true){
 
@@ -108,10 +107,11 @@ function sideToJSON(side){
            theMolecule.addAtom(atom, parseInt(subscript));
 
         //Just a Capital on Its Own
+      } else if(numRegex.test(rest[j])===true){
+           let anAtom = rest[j];
+           theMolecule.addAtom(anAtom, 1);
          } else {
-           let atom = '';
-           atom += rest[j];
-           theMolecule.addAtom(atom, 1);
+           throw Error;
          }
       }
     }
@@ -120,63 +120,72 @@ function sideToJSON(side){
     return theSide;
  } //sideToJSON end
 
-
  let reactants = sideToJSON(leftMolecules);
  let products = sideToJSON(rightMolecules);
  let equation = new Equation(reactants, products);
+ return equation;
+}
+let next = stringToJSON(thingy);
+console.log(next);
 
+// switch statement
+
+function num2Letter(c){
+  switch(c){
+    case 1: return 'a';
+    case 2: return 'b';
+    case 3: return 'c';
+    case 4: return 'd';
+    case 5: return 'e';
+    case 6: return 'f';
+    case 7: return 'g';
+    case 8: return 'h';
+    case 9: return 'i';
+    case 10: return 'j';
+    default: return 0;
+  }
+}
  ///////////////////////////////////
  ///////////////////////////////////
 
- function balance(equation){
-   let reactants = buildMap(equation.reactants);
-   let products = buildMap(equation.products);
 
-   //if the maps are not equal on both sides
-   for(let item in reactants){
-     if(reactants[item] < products[item]){
-       let theAtom = item;
-       let reactants = equation.reactants;
-       for(let molecule of reactants.molecules){
-         if(molecule.contains(theAtom)){
-             molecule.coefficent+=1;
+function createEquations(equation){
+  let reactants = equation.reactants;
+  let products = equation.products;
+  let map = {};
+  for(let molecule of reactants.molecules){
+    let coefficent = molecule.coefficent;
+    for(let atom of molecule.atoms){
+          if(atom.name.includes('undefined')=== true){
+          atom.name = atom.name.substring(0, 1);
            }
-           console.log(equation);
-           return balance(equation);
-         }
-       } //if end
-
-    if(reactants[item] > products[item]){
-          let theAtom = item;
-          let products = equation.products;
-          for(let molecule of products.molecules){
-            if(molecule.contains(theAtom)){
-                molecule.coefficent+=1;
-                return balance(equation);
-              }
-            }
-          } //if end
+      if(!map[atom.name]){
+        map[atom.name] = atom.subscript.toString() + coefficent;
+      } else {
+        map[atom.name] += '+' + atom.subscript.toString() + coefficent;
       }
-       return equation;
-    } //balance end
-//////////////////////////////
-/////////////////////////////
-
-
-function buildMap(side){
-    let map = {};
-    for(let molecule of side.molecules){
-        let coefficent = molecule.coefficent;
-        for(let atom of molecule.atoms){
-          if(!map[atom.name]){
-           map[atom.name] = atom.subscript * coefficent;
-         } else {
-           map[atom.name] += atom.subscript * coefficent;
-         }
-        }
     }
-     return map;
-} //buildMap end
+  }
 
+  let map2 = {};
+  for(let molecule of products.molecules){
+  let coefficent = molecule.coefficent;
+  for(let atom of molecule.atoms){
+        if(atom.name.includes('undefined')=== true){
+        atom.name = atom.name.substring(0, 1);
+         }
+    if(!map2[atom.name]){
+      map2[atom.name] = atom.subscript.toString() + coefficent;
+    } else {
+      map2[atom.name] += '+' + atom.subscript.toString() + coefficent;
+    }
+  }
+}
+for(let value in map){
+  map[value]+= '='+ map2[value];
+}
+  return map;
+}
 
-balance(equation);
+let print = createEquations(next);
+console.log(print);
