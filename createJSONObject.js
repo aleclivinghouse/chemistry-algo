@@ -34,13 +34,24 @@ Molecule.prototype.contains = function(name){
   return false;
 }
 
+function aCoefficent(letter){
+  this.letter = letter;
+  this.value = 0;
+  this.solved = false;
+}
+
+aCoefficent.prototype.solve = function(value){
+  this.value = value;
+  this.solved = true;
+}
 ////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
  // let data = "1C6H12O6+6O2=6Co2+6H2O";
 let thingy = '2FeCl3+MgO=Fe2O3+MgCl2';
-function stringToJSON(data){
 
+
+function stringToJSON(data){
 let sides = data.split("=");
 let leftMolecules = sides[0].split("+");
 let rightMolecules = sides[1].split("+");
@@ -48,15 +59,14 @@ let coCount = 1;
 function sideToJSON(side){
   let arr = [];
    let theSide = new Side();
+
    for(let molecule of side){
-    let arr = [];
     let capitalRegex = /[A-Z]/;
     let lowerCaseRegex = /[a-z]/;
     let numRegex = /[0-9]/;
     let letter = num2Letter(coCount);
     let theMolecule = new Molecule(letter);
     coCount++;
-
     let rest = molecule;
 
     for(let j = 0; j<rest.length; j++){
@@ -126,7 +136,7 @@ function sideToJSON(side){
  return equation;
 }
 let next = stringToJSON(thingy);
-console.log(next);
+// console.log(next);
 
 // switch statement
 
@@ -149,43 +159,122 @@ function num2Letter(c){
  ///////////////////////////////////
 
 
-function createEquations(equation){
-  let reactants = equation.reactants;
-  let products = equation.products;
-  let map = {};
-  for(let molecule of reactants.molecules){
-    let coefficent = molecule.coefficent;
-    for(let atom of molecule.atoms){
-          if(atom.name.includes('undefined')=== true){
-          atom.name = atom.name.substring(0, 1);
+ function createEquations(equation){
+   let reactants = equation.reactants;
+   let products = equation.products;
+   let map = {};
+   for(let molecule of reactants.molecules){
+     let coefficent = molecule.coefficent;
+     for(let atom of molecule.atoms){
+           if(atom.name.includes('undefined')=== true){
+           atom.name = atom.name.substring(0, 1);
+            }
+       if(!map[atom.name]){
+         map[atom.name] = atom.subscript.toString() + coefficent;
+       } else {
+         map[atom.name] += '+' + atom.subscript.toString() + coefficent;
+       }
+     }
+   }
+
+   let map2 = {};
+   for(let molecule of products.molecules){
+   let coefficent = molecule.coefficent;
+   for(let atom of molecule.atoms){
+         if(atom.name.includes('undefined')=== true){
+         atom.name = atom.name.substring(0, 1);
+          }
+     if(!map2[atom.name]){
+       map2[atom.name] = atom.subscript.toString() + coefficent;
+     } else {
+       map2[atom.name] += '+' + atom.subscript.toString() + coefficent;
+     }
+   }
+ }
+ for(let value in map){
+   map[value]+= '='+ map2[value];
+ }
+   return map;
+ }
+
+
+
+let putItIn = createEquations(next);
+
+function balance(map){
+ let values = Object.values(map);
+ let firstLetter = findFirstLetter(map);
+ let equationsToSolve = setLetterToOne(values, firstLetter);
+ return equationsToSolve;
+}
+
+let print = balance(putItIn);
+console.log(print);
+
+
+
+function findFirstLetter(theMap){
+  let lowerCaseRegex = /[a-z]/;
+  let found = false;
+  let equations = Object.values(theMap);
+      while(found === false){
+      for(let equation of equations){
+         for(let i=0; i < equation.length; i++){
+           if(lowerCaseRegex.test(equation[i])===true){
+              letter = equation[i];
            }
-      if(!map[atom.name]){
-        map[atom.name] = atom.subscript.toString() + coefficent;
-      } else {
-        map[atom.name] += '+' + atom.subscript.toString() + coefficent;
+         }
+         if(letter.length < 3){
+           theLetter = letter;
+           found = true;
+         }
+         return theLetter;
+      } //foreach end
+    } //while end
+}
+
+function setLetterToOne(equations, letter){
+  let newEquations = [];
+  for(equation of equations){
+    for(let i = 0; i < equation.length; i++){
+      if(equation[i]===letter){
+        equation = equation.replace(letter, '(1)');
+         newEquations.push(equation);
       }
     }
+    newEquations.push(equation)
   }
+   return removeDuplicates(newEquations);
+}
 
-  let map2 = {};
-  for(let molecule of products.molecules){
-  let coefficent = molecule.coefficent;
-  for(let atom of molecule.atoms){
-        if(atom.name.includes('undefined')=== true){
-        atom.name = atom.name.substring(0, 1);
-         }
-    if(!map2[atom.name]){
-      map2[atom.name] = atom.subscript.toString() + coefficent;
-    } else {
-      map2[atom.name] += '+' + atom.subscript.toString() + coefficent;
+function createCoefficentObjects(theMap){
+  let lowerCaseRegex = /[a-z]/;
+  let equations = Object.values(theMap);
+  let str = '';
+  let theCoefficents = [];
+  for(let equation of equations){
+    for(let i = 0; i < equation.length; i++){
+      if(lowerCaseRegex.test(equation[i])===true && str.includes(equation[i])===false){
+        let coefficent = new aCoefficent(equation[i]);
+        theCoefficents.push(coefficent);
+        str+=equation[i];
+      }
     }
-  }
-}
-for(let value in map){
-  map[value]+= '='+ map2[value];
-}
-  return map;
+  } //for end
+  return theCoefficents;
 }
 
-let print = createEquations(next);
-console.log(print);
+
+
+
+
+
+function removeDuplicates(arr){
+    let unique_array = []
+    for(let i = 0;i < arr.length; i++){
+        if(unique_array.indexOf(arr[i]) == -1){
+            unique_array.push(arr[i])
+        }
+    }
+    return unique_array
+}

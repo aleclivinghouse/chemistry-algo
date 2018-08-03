@@ -37,3 +37,6 @@
   ] //molecules end
  } //side 2 end
 } //equatuoi
+
+
+theCoefficents = [{"letter": 'a', "value": 1, solved: true}]
