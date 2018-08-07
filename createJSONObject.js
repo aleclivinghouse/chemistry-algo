@@ -1,3 +1,7 @@
+var algebra = require('algebra.js');
+var Fraction = algebra.Fraction;
+var Expression = algebra.Expression;
+var Equation = algebra.Equation;
 
 function Molecule(coefficent){
   this.coefficent = coefficent;
@@ -8,7 +12,7 @@ function Side(){
   this.molecules = [];
 };
 
-function Equation(reactants, products){
+function ChemEquation(reactants, products){
   this.reactants = reactants;
   this.products = products;
 };
@@ -132,7 +136,7 @@ function sideToJSON(side){
 
  let reactants = sideToJSON(leftMolecules);
  let products = sideToJSON(rightMolecules);
- let equation = new Equation(reactants, products);
+ let equation = new ChemEquation(reactants, products);
  return equation;
 }
 let next = stringToJSON(thingy);
@@ -200,32 +204,237 @@ function num2Letter(c){
 
 
 let putItIn = createEquations(next);
+////////////////////////////////////
+/////////////////////////////////
 
 function balance(map){
+ let coefficentObjects = createCoefficentObjects(map);
  let values = Object.values(map);
+ //returns a letter
  let firstLetter = findFirstLetter(map);
+
+ //this returns [ '1*1=2c', '3*1=2d', '1b=1d', '1b=3c' ]
  let equationsToSolve = setLetterToOne(values, firstLetter);
- return equationsToSolve;
+
+//this returns a list with all the coefficentObjects
+//with a having a value of one
+ coefficentObjects = setCoefficentObjectOne(coefficentObjects, firstLetter);
+
+ let i = 0;
+ //while loop here
+
+ //this returns 1*1 = 2c
+  equationToSolveNext = solveNext(equationsToSolve);
+
+ //this returns { value: '1', letter: 'c' }
+ let answer = solve(equationToSolveNext);
+
+ coefficentObjects = setCoefficentObjectValue(coefficentObjects, answer.letter, answer.value);
+
+ //this should return the new equations
+ equationsToSolve = setLetterToValue(equationToSolveNext, answer.letter, answer.value);
+
+  console.log(coefficentObjects);
+
+  //return coefficentObjects when while loop is done
 }
 
 let print = balance(putItIn);
-console.log(print);
+// console.log(print);
+//////////////////////////////
+////////////////////////////
 
+function solve(solveNext){
+  let lowerCaseRegex = /[a-z]/;
+  let capitalRegex = /[A-Z]/;
+  let numRegex = /[0-9]/;
+  let letter = "";
+
+  //find the letter in the string
+  for(let i = 0; i < solveNext.length; i++){
+    if(lowerCaseRegex.test(solveNext[i])===true){
+      letter += solveNext[i];
+    }
+  }
+
+  sides = solveNext.split('=');
+  let leftSide = sides[0];
+  let rightSide = sides[1];
+  console.log(leftSide);
+  console.log(rightSide);
+  let sideToUse = '';
+  let otherSide = '';
+  if(leftSide.includes(letter)){
+    sideToUse += leftSide;
+    otherSide += rightSide;
+  } else {
+    sideToUse += rightSide;
+    otherSide += leftSide;
+  }
+
+  let expression = new Expression(letter);
+  for(let i = 0; i < sideToUse.length; i++){
+    //in the case of -32x
+    if(sideToUse[i]==='-' && numRegex.test(sideToUse[i+1])===true && numRegex.test(sideToUse[i+2])===true && lowerCaseRegex.test(sideToUse[i+3])===true){
+      let strToCut = '';
+      let numStr ='';
+      let theStart = 1;
+      numStr+= sideToUse[i+1];
+      numStr+= sideToUse[i+2];
+      strToCut+=sideToUse[i];
+      strToCut+=sideToUse[i+1];
+      strToCut+=sideToUse[i+2];
+      strToCut+=sideToUse[i+3];
+      let rest = sideToUse.replace(strToCut, '');
+      while(theStart < parseInt(numStr)){
+        expression.subtract(letter);
+        theStart++;
+      } //while end
+      expression.add(rest);
+    } //if end
+       //in the case of +32x
+    if(sideToUse[i]==='+' && numRegex.test(sideToUse[i+1])===true && numRegex.test(sideToUse[i+2])===true && lowerCaseRegex.test(sideToUse[i+3])===true){
+      let strToCut = '';
+      let numStr ='';
+      let theStart = 1;
+      numStr+= sideToUse[i+1];
+      numStr+= sideToUse[i+2];
+      strToCut+=sideToUse[i];
+      strToCut+=sideToUse[i+1];
+      strToCut+=sideToUse[i+2];
+      strToCut+=sideToUse[i+3];
+      let rest = sideToUse.replace(strToCut, '');
+      while(theStart < parseInt(numStr)){
+        expression.add(letter);
+        theStart++;
+      } //while end
+      expression.add(rest);
+    } //if end
+        // in the case of -3x
+    if(sideToUse[i]==='-' && numRegex.test(sideToUse[i+1])===true && lowerCaseRegex.test(sideToUse[i+2])===true){
+          let strToCut = '';
+          let numStr ='';
+          let theStart = 1;
+          numStr+=sideToUse[i+1];
+          strToCut+=sideToUse[i];
+          strToCut+=sideToUse[i+1];
+          strToCut+=sideToUse[i+2];
+          let rest = sideToUse.replace(strToCut, '');
+          while(theStart < parseInt(numStr)){
+            expression.subtract(letter);
+            theStart++;
+          } //while end
+          expression.add(rest);
+        }//if end
+
+        //in the case of +3x
+     if(sideToUse[i]==='+' && numRegex.test(sideToUse[i+1])===true && lowerCaseRegex.test(sideToUse[i+2])===true){
+              let strToCut = '';
+              let numStr ='';
+              let theStart = 1;
+              numStr+=sideToUse[i+1];
+              strToCut+=sideToUse[i];
+              strToCut+=sideToUse[i+1];
+              strToCut+=sideToUse[i+2];
+              let rest = sideToUse.replace(strToCut, '');
+
+              while(theStart < parseInt(numStr)){
+                expression.add(letter)
+                theStart++;
+              } //while end
+              expression.add(rest);
+            }//if end
+
+      //in the case of 3x
+      if(numRegex.test(sideToUse[i])===true && lowerCaseRegex.test(sideToUse[i+1])===true){
+            let strToCut = '';
+            let numStr ='';
+            let theStart = 1;
+            numStr+=sideToUse[i];
+            strToCut+=sideToUse[i];
+            strToCut+=sideToUse[i+1];
+            let rest = sideToUse.replace(strToCut, '');
+           while(theStart < parseInt(numStr)){
+              expression.add(letter)
+              theStart++;
+            } //while end
+           expression.add(rest);
+          }//if end
+  } //for end
+ otherSide = eval(otherSide);
+ let eq = new Equation(expression, otherSide);
+ let answer = eq.solveFor(letter);
+ let answerMap = {};
+ answerMap['value'] = answer.toString();
+ answerMap['letter'] = letter;
+ console.log(answerMap);
+ return answerMap;
+
+
+
+/*
+we need to return a map
+answer = {
+ letter
+ value
+}
+*/
+
+
+} //solve end
+
+
+function solveNext(equationsToSolve){
+    let lowerCaseRegex = /[a-z]/;
+    let letterCount = 0;
+  for(let equation of equationsToSolve){
+    for(let i=0; i < equation.length; i++){
+      if(lowerCaseRegex.test(equation[i])===true){
+        letterCount++;
+      }
+    }
+    if(letterCount < 2){
+      return equation;
+      break;
+    }
+  } //foreach end
+}
+
+
+function setCoefficentObjectOne(coefficentObjects, letter){
+  for(let object of coefficentObjects){
+    if(object.letter === letter){
+      object.value = 1;
+      object.solved = true;
+    }
+  }
+  return coefficentObjects;
+}
+function setCoefficentObjectValue(coefficentObjects, letter, value){
+  for(let object of coefficentObjects){
+    if(object.letter === letter){
+      object.value = value;
+      object.solved = true;
+    }
+  }
+  return coefficentObjects;
+}
 
 
 function findFirstLetter(theMap){
   let lowerCaseRegex = /[a-z]/;
   let found = false;
+  let letters = [];
   let equations = Object.values(theMap);
       while(found === false){
       for(let equation of equations){
          for(let i=0; i < equation.length; i++){
            if(lowerCaseRegex.test(equation[i])===true){
-              letter = equation[i];
+              letters.push(equation[i]);
            }
          }
-         if(letter.length < 3){
-           theLetter = letter;
+         if(letters.length < 3){
+           theLetter = letters[0];
            found = true;
          }
          return theLetter;
@@ -233,13 +442,45 @@ function findFirstLetter(theMap){
     } //while end
 }
 
-function setLetterToOne(equations, letter){
+
+function setLetterToValue(equations, letter, value){
+  let lowerCaseRegex = /[a-z]/;
+  let numRegex = /[0-9]/;
   let newEquations = [];
   for(equation of equations){
     for(let i = 0; i < equation.length; i++){
-      if(equation[i]===letter){
-        equation = equation.replace(letter, '(1)');
+      if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
+          equation = equation.replace(letter, '*'+value+'*');
          newEquations.push(equation);
+      } else if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===false){
+          equation = equation.replace(letter, '*' + value);
+      } else if(numRegex.test(equation[i])===false && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
+        equation = equation.replace(letter, value+'*');
+      } else {
+        equation.replace(letter, value);
+      }
+    }
+    newEquations.push(equation)
+  }
+   return removeDuplicates(newEquations);
+}
+
+function setLetterToOne(equations, letter){
+  let lowerCaseRegex = /[a-z]/;
+  let numRegex = /[0-9]/;
+  let newEquations = [];
+  for(equation of equations){
+    equation = equation.replace(" ", "");
+    for(let i = 0; i < equation.length; i++){
+      if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
+          equation = equation.replace(letter, '*1*');
+         newEquations.push(equation);
+      } else if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===false){
+          equation = equation.replace(letter, '*1');
+      } else if(numRegex.test(equation[i])===false && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
+        equation = equation.replace(letter, '1*');
+      } else {
+        equation.replace(letter, '1');
       }
     }
     newEquations.push(equation)
@@ -265,16 +506,12 @@ function createCoefficentObjects(theMap){
 }
 
 
-
-
-
-
 function removeDuplicates(arr){
-    let unique_array = []
+    let unique_array = [];
     for(let i = 0;i < arr.length; i++){
         if(unique_array.indexOf(arr[i]) == -1){
-            unique_array.push(arr[i])
+            unique_array.push(arr[i]);
         }
     }
-    return unique_array
+    return unique_array;
 }
