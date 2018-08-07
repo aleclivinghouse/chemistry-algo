@@ -52,7 +52,7 @@ aCoefficent.prototype.solve = function(value){
 /////////////////////////////////////////////////////
 
  // let data = "1C6H12O6+6O2=6Co2+6H2O";
-let thingy = '2FeCl3+MgO=Fe2O3+MgCl2';
+let thingy = 'B5H9+O2=B2O3+H2O';
 
 
 function stringToJSON(data){
@@ -199,6 +199,7 @@ function num2Letter(c){
    map[value]+= '='+ map2[value];
  }
    return map;
+   console.log('this is the map for the equation ' + map);
  }
 
 
@@ -210,40 +211,32 @@ let putItIn = createEquations(next);
 function balance(map){
  let coefficentObjects = createCoefficentObjects(map);
  let values = Object.values(map);
- //returns a letter
+  console.log('these are the equations to begin with ' + values);
  let firstLetter = findFirstLetter(map);
-
- //this returns [ '1*1=2c', '3*1=2d', '1b=1d', '1b=3c' ]
  let equationsToSolve = setLetterToOne(values, firstLetter);
-
-//this returns a list with all the coefficentObjects
-//with a having a value of one
- coefficentObjects = setCoefficentObjectOne(coefficentObjects, firstLetter);
-
+ let newCoefficentObjects = setCoefficentObjectOne(coefficentObjects, firstLetter);
  let i = 0;
- //while loop here
+ let final = balanceRest(newCoefficentObjects, equationsToSolve, i);
+ return final;
+}//balance end
 
- //this returns 1*1 = 2c
-  equationToSolveNext = solveNext(equationsToSolve);
-
- //this returns { value: '1', letter: 'c' }
- let answer = solve(equationToSolveNext);
-
- coefficentObjects = setCoefficentObjectValue(coefficentObjects, answer.letter, answer.value);
-
- //this should return the new equations
- equationsToSolve = setLetterToValue(equationToSolveNext, answer.letter, answer.value);
-
-  console.log(coefficentObjects);
-
-  //return coefficentObjects when while loop is done
-}
+function balanceRest(theCoefficentObjects, theEquationsToSolve, i){
+  if(i === theCoefficentObjects.length -1){
+    return theCoefficentObjects;
+  }
+ //this SHOULD Return and equation
+   equationToSolveNext = solveNext(theEquationsToSolve);
+   let answer = solve(equationToSolveNext);
+   let coefficentObjects2 = setCoefficentObjectValue(theCoefficentObjects, answer.letter, answer.value);
+   let equationsToSolve2 = setLetterToValue(theEquationsToSolve, answer.letter, answer.value);
+   return balanceRest(coefficentObjects2, equationsToSolve2, i+1);
+} //balance rest end
 
 let print = balance(putItIn);
-// console.log(print);
+ console.log(print);
 //////////////////////////////
 ////////////////////////////
-
+//BUG solve is not solving correctly
 function solve(solveNext){
   let lowerCaseRegex = /[a-z]/;
   let capitalRegex = /[A-Z]/;
@@ -260,8 +253,6 @@ function solve(solveNext){
   sides = solveNext.split('=');
   let leftSide = sides[0];
   let rightSide = sides[1];
-  console.log(leftSide);
-  console.log(rightSide);
   let sideToUse = '';
   let otherSide = '';
   if(leftSide.includes(letter)){
@@ -273,6 +264,7 @@ function solve(solveNext){
   }
 
   let expression = new Expression(letter);
+  sideToUse = sideToUse.replace(" ", "");
   for(let i = 0; i < sideToUse.length; i++){
     //in the case of -32x
     if(sideToUse[i]==='-' && numRegex.test(sideToUse[i+1])===true && numRegex.test(sideToUse[i+2])===true && lowerCaseRegex.test(sideToUse[i+3])===true){
@@ -362,41 +354,32 @@ function solve(solveNext){
           }//if end
   } //for end
  otherSide = eval(otherSide);
+ console.log('this is otherSide ' + otherSide);
  let eq = new Equation(expression, otherSide);
  let answer = eq.solveFor(letter);
  let answerMap = {};
+ answer = answer.toString();
  answerMap['value'] = answer.toString();
  answerMap['letter'] = letter;
  console.log(answerMap);
  return answerMap;
 
-
-
-/*
-we need to return a map
-answer = {
- letter
- value
-}
-*/
-
-
 } //solve end
-
 
 function solveNext(equationsToSolve){
     let lowerCaseRegex = /[a-z]/;
-    let letterCount = 0;
   for(let equation of equationsToSolve){
     for(let i=0; i < equation.length; i++){
+      let letterCount = 0;
       if(lowerCaseRegex.test(equation[i])===true){
         letterCount++;
       }
-    }
-    if(letterCount < 2){
+
+    if(letterCount === 1){
       return equation;
       break;
-    }
+     }
+   } //for end
   } //foreach end
 }
 
@@ -461,6 +444,7 @@ function setLetterToValue(equations, letter, value){
       }
     }
     newEquations.push(equation)
+
   }
    return removeDuplicates(newEquations);
 }
@@ -470,7 +454,7 @@ function setLetterToOne(equations, letter){
   let numRegex = /[0-9]/;
   let newEquations = [];
   for(equation of equations){
-    equation = equation.replace(" ", "");
+
     for(let i = 0; i < equation.length; i++){
       if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
           equation = equation.replace(letter, '*1*');
@@ -483,8 +467,10 @@ function setLetterToOne(equations, letter){
         equation.replace(letter, '1');
       }
     }
-    newEquations.push(equation)
+    newEquations.push(equation);
+
   }
+
    return removeDuplicates(newEquations);
 }
 
