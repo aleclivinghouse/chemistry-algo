@@ -5,7 +5,7 @@ var Expression = algebra.Expression;
 var Equation = algebra.Equation;
 
 let theNum = ("x");
-var expr = new Expression("2x-3");
+var expr = new Expression("2-3");
 expr = expr.subtract(3);
 expr = expr.add("x");
 

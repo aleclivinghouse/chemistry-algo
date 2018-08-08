@@ -267,6 +267,7 @@ function solve(solveNext){
   sideToUse = sideToUse.replace(" ", "");
   for(let i = 0; i < sideToUse.length; i++){
     //in the case of -32x
+    console.log('this is what were trying to solve ' + sideToUse);
     if(sideToUse[i]==='-' && numRegex.test(sideToUse[i+1])===true && numRegex.test(sideToUse[i+2])===true && lowerCaseRegex.test(sideToUse[i+3])===true){
       let strToCut = '';
       let numStr ='';
@@ -283,6 +284,9 @@ function solve(solveNext){
         theStart++;
       } //while end
       expression.add(rest);
+      console.log('this is the finished expression: ' + expression);
+      console.log('this string gets cut ' + strToCut);
+      console.log('this is numStr ' + numStr);
     } //if end
        //in the case of +32x
     if(sideToUse[i]==='+' && numRegex.test(sideToUse[i+1])===true && numRegex.test(sideToUse[i+2])===true && lowerCaseRegex.test(sideToUse[i+3])===true){
@@ -301,6 +305,9 @@ function solve(solveNext){
         theStart++;
       } //while end
       expression.add(rest);
+      console.log('this is the finished expression: ' + expression);
+      console.log('this string gets cut ' + strToCut);
+      console.log('this is numStr ' + numStr);
     } //if end
         // in the case of -3x
     if(sideToUse[i]==='-' && numRegex.test(sideToUse[i+1])===true && lowerCaseRegex.test(sideToUse[i+2])===true){
@@ -317,6 +324,9 @@ function solve(solveNext){
             theStart++;
           } //while end
           expression.add(rest);
+          console.log('this is the finished expression: ' + expression);
+          console.log('this string gets cut ' + strToCut);
+          console.log('this is numStr ' + numStr);
         }//if end
 
         //in the case of +3x
@@ -335,6 +345,9 @@ function solve(solveNext){
                 theStart++;
               } //while end
               expression.add(rest);
+              console.log('this is the finished expression:' + expression);
+              console.log('this string gets cut ' + strToCut);
+              console.log('this is numStr ' + numStr);
             }//if end
 
       //in the case of 3x
@@ -347,10 +360,13 @@ function solve(solveNext){
             strToCut+=sideToUse[i+1];
             let rest = sideToUse.replace(strToCut, '');
            while(theStart < parseInt(numStr)){
-              expression.add(letter)
+              expression.add(letter);
               theStart++;
             } //while end
            expression.add(rest);
+           console.log('this is the finished expression: ' + expression);
+           console.log('this string gets cut ' + strToCut);
+           console.log('this is numStr ' + numStr);
           }//if end
   } //for end
  otherSide = eval(otherSide);
