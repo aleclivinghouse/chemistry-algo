@@ -2,11 +2,15 @@
 //first replace a with 1
 //then find an equation with only one other letter and solve for that letter
 //then if one of the other equations contains the letter/ replace it with the answer
-
-var algebra = require('algebra.js');
-var Fraction = algebra.Fraction;
-var Expression = algebra.Expression;
-var Equation = algebra.Equation;
+const isDivisible = function(justNumbers, toDivide){
+  let answer;
+  if(justNumbers%parseInt(toDivide)===0){
+    answer = justNumbers/toDivide;
+    answer = answer.toString();
+  }
+  else answer = justNumbers.toString() + '/' + toDivide;
+  return answer;
+}
 
 function Molecule(coefficent){
   this.coefficent = coefficent;
@@ -56,8 +60,8 @@ aCoefficent.prototype.solve = function(value){
 ////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
   //
- let thingy = 'B5H9+O2=B2O3+H2O';
-  // let thingy = 'Li+H3PO4=H2+Li3PO4';
+ // let thingy = 'B5H9+O2=B2O3+H2O';
+let thingy = 'Li+H3PO4=H2+Li3PO4';
 
 
 function stringToJSON(data){
@@ -291,100 +295,30 @@ function solve(solveNext){
     sideWithVariable += rightSide;
     justNumbers = leftSide;
   }
-
+  console.log('this is the equation going in ' + sides);
+  console.log('this is the side of the arr with the variable ' + sideWithVariable);
   justNumbers = eval(justNumbers);
-
-
-  if(lowerCaseRegex.test(sideWithVariable[0])===true && flag===false){
-    //b+5=20
-    let flag = true;
-    let letter = sideWithVariable[0];
-    let toSubtract = sideWithVariable.replace(letter, '');
-    //b = 20 -5
-    if(justNumbers[justNumbers.length-1]==='+'){
-      justNumbers = justNumbers.substring(0, justNumbers.length-1);
+  console.log('this is the side of the equals sign with just numbers ' + justNumbers);
+  let arrToUse = sideWithVariable.split("+");
+  console.log('this is the arr we use to solve ' + arrToUse);
+  // console.log('this is the arr brfoken up by the = sign: ' + arrToUse);
+  let toSubtract = 0;
+  let withVariable = '';
+  for(let item of arrToUse){
+    if(!item.includes(letter)){
+      toSubtract += parseInt(item);
+    } else {
+      withVariable+= item;
     }
-    if(toSubtract.length > 0){
-    justNumbers += '-' + toSubtract;
-    }
-    let newRight = eval(justNumbers).toString();
-    let isolatedVar = letter + '=' + newRight;
-    var completed = isolatedVar;
   }
-
-
-  for(let i = 0; i < sideWithVariable.length; i++){
-  let numVar = '';
-  //20b + 33 = 60
-  if(numRegex.test(sideWithVariable[i])===true && numRegex.test(sideWithVariable[i+1])===true && lowerCaseRegex.test(sideWithVariable[i+2])===true && flag===false){
-    flag = true;
-    numVar+=sideWithVariable[i];
-    numVar+=sideWithVariable[i+1];
-    numVar+=sideWithVariable[i+2];
-    let toSubtract = sideWithVariable.replace(numVar, '');
-    if(justNumbers[justNumbers.length-1]==='+'){
-      justNumbers = justNumbers.substring(0, justNumbers.length-1);
-    }
-    if(toSubtract.length > 0){
-    justNumbers += '-' + toSubtract;
-    }
-    let newRight = eval(justNumbers).toString();
-    let newEquation = numVar + '=' + newRight;
-    let theNum = numVar[0] + numVar[1];
-    let isolatedVar = numVar[2] + '=' + newRight + '/' + theNum;
-
-  }
-
-  //2b + 5 = 10
-  if(numRegex.test(sideWithVariable[i])===true && lowerCaseRegex.test(sideWithVariable[i+1])===true && flag===false){
-    flag = true;
-    numVar+=sideWithVariable[i];
-    numVar+=sideWithVariable[i+1];
-    //numVar: 2b
-    let toSubtract = sideWithVariable.replace(numVar, '');
-    //toSubtract: +5
-    //BUG this line is not working the way it should
-    if(toSubtract.length > 0){
-    justNumbers += '-' + toSubtract;
-    }
-    //justNumbers: 10 - + 5
-    if(justNumbers[justNumbers.length-1]==='+'){
-      justNumbers = justNumbers.substring(0, justNumbers.length-1);
-    }
-    console.log('this is justNumbers ' + justNumbers);
-    let newRight = eval(justNumbers).toString();
-    let newEquation = numVar + '=' + newRight;
-    let isolatedVar = numVar[1] + '=' + newRight + '/' + numVar[0];
-    var completed = isolatedVar;
-  } //first if end
-
-  //the if statement isnt quite right
-  if(numRegex.test(sideWithVariable[i])===false && lowerCaseRegex.test(sideWithVariable[i+1])===true && flag===false){
-    //x + 5 = 10
-    let letter = sideWithVariable[i+1];
-    let nums = sideWithVariable.replace(letter, '');
-    let newRight = justNumbers + '-' + nums;
-    let final = parseInt(newRight);
-    let isolatedVar = letter + '=' + final.toString();
-    var completed = isolatedVar;
-  } //2nd if end
-
-  } //for end
-
-  aAnswer = completed.split('=');
-  if(aAnswer[0].includes(letter)){
-    theAnswer = aAnswer[1];
-  } else {
-    theAnswer = aAnswer[0];
-  }
+  justNumbers -= toSubtract;
+  console.log('this is just the side with numbers after the subtraction ' + justNumbers);
+  let toDivide = withVariable.substring(0, withVariable.length-1);
+  let theAnswer = isDivisible(justNumbers, toDivide);
   let answerMap = {};
   answerMap['value'] = theAnswer;
   answerMap['letter'] = letter;
   return answerMap;
-  ////////////////////////////////
-  ////////////////////////////////
-
-
 } //solve end
 
 function solveNext(equationsToSolve){
