@@ -1,18 +1,25 @@
 
-var algebra = require('algebra.js');
-var Fraction = algebra.Fraction;
-var Expression = algebra.Expression;
-var Equation = algebra.Equation;
+//LCM TEST//////////////
 
-let theNum = ("x");
-var expr = new Expression("2-3");
-expr = expr.subtract(3);
-expr = expr.add("x");
+function findLCM(A) {
+    var n = A.length, a = Math.abs(A[0]);
+    for (var i = 1; i < n; i++){
+      var b = Math.abs(A[i]), c = a;
+       while (a && b){ a > b ? a %= b : b %= a; }
+       a = Math.abs(c*A[i])/(a+b);
+     }
+    return a;
+}
 
-let eq = new Equation(expr, 2 * 3);
-console.log(eq.toString());
 
-let x = eq.solveFor(letter);
-console.log(x.toString());
+let thing = [1, 2, 3];
+// console.log(findLCM(thing));
 
-//we are going to need to find the lcd and then multiply all the numbers by the lcd
+
+
+let toPrint = 5/2 * 2;
+console.log(toPrint);
+
+
+//lcm / denominator is toMultiply
+// toMultiply 2 numberator

@@ -1,3 +1,8 @@
+
+//first replace a with 1
+//then find an equation with only one other letter and solve for that letter
+//then if one of the other equations contains the letter/ replace it with the answer
+
 var algebra = require('algebra.js');
 var Fraction = algebra.Fraction;
 var Expression = algebra.Expression;
@@ -259,7 +264,6 @@ function numsLCM(arr){
 
 //////////////////////////////
 ////////////////////////////
-//BUG solve is not solving correctly
 function solve(solveNext){
   let lowerCaseRegex = /[a-z]/;
   let capitalRegex = /[A-Z]/;
