@@ -171,46 +171,30 @@ function num2Letter(c){
 
 
  function createEquations(equation){
-   let reactants = equation.reactants;
-   let products = equation.products;
-   let map = {};
-   for(let molecule of reactants.molecules){
-     let coefficent = molecule.coefficent;
-     for(let atom of molecule.atoms){
-           if(atom.name.includes('undefined')=== true){
-           atom.name = atom.name.substring(0, 1);
-            }
-       if(!map[atom.name]){
-         map[atom.name] = atom.subscript.toString() + coefficent;
-       } else {
-         map[atom.name] += '+' + atom.subscript.toString() + coefficent;
-       }
-     }
-   }
-
-   let map2 = {};
-   for(let molecule of products.molecules){
-   let coefficent = molecule.coefficent;
-   for(let atom of molecule.atoms){
-         if(atom.name.includes('undefined')=== true){
-         atom.name = atom.name.substring(0, 1);
-          }
-     if(!map2[atom.name]){
-       map2[atom.name] = atom.subscript.toString() + coefficent;
-     } else {
-       map2[atom.name] += '+' + atom.subscript.toString() + coefficent;
-     }
-   }
+   let map1 = createMap(equation.reactants);
+   let map2 = createMap(equation.products);
+ for(let value in map1){
+   map1[value]+= '='+ map2[value];
  }
- for(let value in map){
-   map[value]+= '='+ map2[value];
- }
-   return map;
-   console.log('this is the map for the equation ' + map);
+   return map1;
  }
 
-function createMap(){
-
+function createMap(side){
+  let map = {};
+  for(let molecule of side.molecules){
+    let coefficent = molecule.coefficent;
+    for(let atom of molecule.atoms){
+          if(atom.name.includes('undefined')=== true){
+          atom.name = atom.name.substring(0, 1);
+           }
+      if(!map[atom.name]){
+        map[atom.name] = atom.subscript.toString() + coefficent;
+      } else {
+        map[atom.name] += '+' + atom.subscript.toString() + coefficent;
+      }
+    }
+  }
+  return map;
 }
 
 let putItIn = createEquations(next);
@@ -300,6 +284,7 @@ function solve(solveNext){
   }
   console.log('this is just numbers before it is evaluated ' + justNumbers);
   justNumbers = eval(justNumbers);
+  console.log('this is after the evauation ' + justNumbers);
   console.log('this is the side of the equals sign with just numbers ' + justNumbers);
   let arrToUse = sideWithVariable.split("+");
   console.log('this is the arr we use to solve ' + arrToUse);

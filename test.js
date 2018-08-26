@@ -1,10 +1,10 @@
-
+//https://github.com/infusion/Fraction.js/
 const Fraction = require('fraction.js');
-
-console.log(frac.toFraction());
-
-console.log(frac.toString());
-
+let letter = /[a-z]/;
+let value = "x";
+let aString = "3+15x"
+const theSplit = aString.split(letter);
+console.log(theSplit);
 //everything in the equations needs to be stored as a fraction
 //LCM TEST//////////////
 const isDivisible = function(justNumbers, toDivide){
@@ -27,6 +27,7 @@ function findLCM(A) {
      }
     return a;
 }
+
 let thing = '10=2z+5';
 
 function solve(solveNext){
