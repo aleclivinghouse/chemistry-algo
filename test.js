@@ -1,4 +1,11 @@
 
+const Fraction = require('fraction.js');
+
+console.log(frac.toFraction());
+
+console.log(frac.toString());
+
+//everything in the equations needs to be stored as a fraction
 //LCM TEST//////////////
 const isDivisible = function(justNumbers, toDivide){
   let answer;
@@ -77,4 +84,3 @@ function solve(solveNext){
   ////////////////////////////////
 
 } //solve end
-console.log(solve(thing));

@@ -60,8 +60,8 @@ aCoefficent.prototype.solve = function(value){
 ////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
   //
- // let thingy = 'B5H9+O2=B2O3+H2O';
-let thingy = 'Li+H3PO4=H2+Li3PO4';
+ let thingy = 'B5H9+O2=B2O3+H2O';
+// let thingy = 'Li+H3PO4=H2+Li3PO4';
 
 
 function stringToJSON(data){
@@ -209,7 +209,9 @@ function num2Letter(c){
    console.log('this is the map for the equation ' + map);
  }
 
+function createMap(){
 
+}
 
 let putItIn = createEquations(next);
 ////////////////////////////////////
@@ -281,6 +283,7 @@ function solve(solveNext){
     }
   }
   sides = solveNext.split('=');
+  console.log('this is the equation to solve ' + solveNext);
   ////////////////////////////////
   ////////////////////////////////
   let leftSide = sides[0];
@@ -295,8 +298,7 @@ function solve(solveNext){
     sideWithVariable += rightSide;
     justNumbers = leftSide;
   }
-  console.log('this is the equation going in ' + sides);
-  console.log('this is the side of the arr with the variable ' + sideWithVariable);
+  console.log('this is just numbers before it is evaluated ' + justNumbers);
   justNumbers = eval(justNumbers);
   console.log('this is the side of the equals sign with just numbers ' + justNumbers);
   let arrToUse = sideWithVariable.split("+");
@@ -314,6 +316,7 @@ function solve(solveNext){
   justNumbers -= toSubtract;
   console.log('this is just the side with numbers after the subtraction ' + justNumbers);
   let toDivide = withVariable.substring(0, withVariable.length-1);
+  console.log('this is with variable in solve: ' + withVariable);
   let theAnswer = isDivisible(justNumbers, toDivide);
   let answerMap = {};
   answerMap['value'] = theAnswer;
@@ -448,11 +451,6 @@ function createCoefficentObjects(theMap){
 
 
 function removeDuplicates(arr){
-    let unique_array = [];
-    for(let i = 0;i < arr.length; i++){
-        if(unique_array.indexOf(arr[i]) == -1){
-            unique_array.push(arr[i]);
-        }
-    }
-    return unique_array;
+    let unique = [...new Set(arr)];
+    return unique;
 }
