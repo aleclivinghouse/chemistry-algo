@@ -2,6 +2,12 @@
 //first replace a with 1
 //then find an equation with only one other letter and solve for that letter
 //then if one of the other equations contains the letter/ replace it with the answer
+var algebra = require('algebra.js');
+var Fraction = algebra.Fraction;
+var Expression = algebra.Expression;
+var Equation = algebra.Equation;
+
+
 const isDivisible = function(justNumbers, toDivide){
   let answer;
   if(justNumbers%parseInt(toDivide)===0){
@@ -60,8 +66,8 @@ aCoefficent.prototype.solve = function(value){
 ////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
   //
- let thingy = 'B5H9+O2=B2O3+H2O';
-// let thingy = 'Li+H3PO4=H2+Li3PO4';
+ // let thingy = 'B5H9+O2=B2O3+H2O';
+let thingy = 'Li+H3PO4=H2+Li3PO4';
 
 
 function stringToJSON(data){
@@ -282,9 +288,8 @@ function solve(solveNext){
     sideWithVariable += rightSide;
     justNumbers = leftSide;
   }
-  console.log('this is just numbers before it is evaluated ' + justNumbers);
   justNumbers = eval(justNumbers);
-  console.log('this is after the evauation ' + justNumbers);
+  console.log('this is after the evauation and should be a fraction' + justNumbers);
   console.log('this is the side of the equals sign with just numbers ' + justNumbers);
   let arrToUse = sideWithVariable.split("+");
   console.log('this is the arr we use to solve ' + arrToUse);
