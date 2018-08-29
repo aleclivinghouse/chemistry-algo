@@ -8,16 +8,6 @@ var Expression = algebra.Expression;
 var Equation = algebra.Equation;
 
 
-const isDivisible = function(justNumbers, toDivide){
-  let answer;
-  if(justNumbers%parseInt(toDivide)===0){
-    answer = justNumbers/toDivide;
-    answer = answer.toString();
-  }
-  else answer = justNumbers.toString() + '/' + toDivide;
-  return answer;
-}
-
 function Molecule(coefficent){
   this.coefficent = coefficent;
   this.atoms = [];
@@ -272,44 +262,10 @@ function solve(solveNext){
       letter += solveNext[i];
     }
   }
-  sides = solveNext.split('=');
-  console.log('this is the equation to solve ' + solveNext);
-  ////////////////////////////////
-  ////////////////////////////////
-  let leftSide = sides[0];
-  let rightSide = sides[1];
-  let sideWithVariable = '';
-  let justNumbers = '';
-  let flag = false;
-  if(leftSide.includes(letter)){
-    sideWithVariable += leftSide;
-    justNumbers = rightSide;
-  } else {
-    sideWithVariable += rightSide;
-    justNumbers = leftSide;
-  }
-  justNumbers = eval(justNumbers);
-  console.log('this is after the evauation and should be a fraction' + justNumbers);
-  console.log('this is the side of the equals sign with just numbers ' + justNumbers);
-  let arrToUse = sideWithVariable.split("+");
-  console.log('this is the arr we use to solve ' + arrToUse);
-  // console.log('this is the arr brfoken up by the = sign: ' + arrToUse);
-  let toSubtract = 0;
-  let withVariable = '';
-  for(let item of arrToUse){
-    if(!item.includes(letter)){
-      toSubtract += parseInt(item);
-    } else {
-      withVariable+= item;
-    }
-  }
-  justNumbers -= toSubtract;
-  console.log('this is just the side with numbers after the subtraction ' + justNumbers);
-  let toDivide = withVariable.substring(0, withVariable.length-1);
-  console.log('this is with variable in solve: ' + withVariable);
-  let theAnswer = isDivisible(justNumbers, toDivide);
+  let eq = algebra.parse(solveNext);
+  let theAnswer = eq.solveFor(letter);
   let answerMap = {};
-  answerMap['value'] = theAnswer;
+  answerMap['value'] = theAnswer.toString();
   answerMap['letter'] = letter;
   return answerMap;
 } //solve end
