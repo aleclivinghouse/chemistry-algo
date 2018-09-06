@@ -1,4 +1,3 @@
-
 //first replace a with 1
 //then find an equation with only one other letter and solve for that letter
 //then if one of the other equations contains the letter/ replace it with the answer
@@ -6,6 +5,10 @@ var algebra = require('algebra.js');
 var Fraction = algebra.Fraction;
 var Expression = algebra.Expression;
 var Equation = algebra.Equation;
+// var molecule = require('classes').Molecule;
+// var ChemEquation= require('classes').ChemEquation;
+// var aCoefficent = require('classes').aCoefficent;
+// var Side = require('classes').Side;
 
 
 function Molecule(coefficent){
@@ -57,10 +60,10 @@ aCoefficent.prototype.solve = function(value){
 /////////////////////////////////////////////////////
   //
  // let thingy = 'B5H9+O2=B2O3+H2O';
-let thingy = 'Li+H3PO4=H2+Li3PO4';
+// let thingy = 'Li+H3PO4=H2+Li3PO4';
 
 
-function stringToJSON(data){
+const stringToJSON = function(data){
 let sides = data.split("=");
 let leftMolecules = sides[0].split("+");
 let rightMolecules = sides[1].split("+");
@@ -142,12 +145,12 @@ function sideToJSON(side){
  let equation = new ChemEquation(reactants, products);
  return equation;
 }
-let next = stringToJSON(thingy);
+
 // console.log(next);
 
 // switch statement
 
-function num2Letter(c){
+const num2Letter = function(c){
   switch(c){
     case 1: return 'a';
     case 2: return 'b';
@@ -166,7 +169,7 @@ function num2Letter(c){
  ///////////////////////////////////
 
 
- function createEquations(equation){
+const createEquations = function(equation){
    let map1 = createMap(equation.reactants);
    let map2 = createMap(equation.products);
  for(let value in map1){
@@ -175,7 +178,7 @@ function num2Letter(c){
    return map1;
  }
 
-function createMap(side){
+const createMap = function(side){
   let map = {};
   for(let molecule of side.molecules){
     let coefficent = molecule.coefficent;
@@ -193,11 +196,10 @@ function createMap(side){
   return map;
 }
 
-let putItIn = createEquations(next);
-////////////////////////////////////
-/////////////////////////////////
 
-function balance(map){
+////////////////////////////////////
+
+const balance = function(map){
  let coefficentObjects = createCoefficentObjects(map);
  let values = Object.values(map);
  let firstLetter = findFirstLetter(map);
@@ -208,7 +210,7 @@ function balance(map){
  return final;
 }//balance end
 
-function balanceRest(theCoefficentObjects, theEquationsToSolve, i){
+const balanceRest = function(theCoefficentObjects, theEquationsToSolve, i){
   if(i === theCoefficentObjects.length -1){
     return theCoefficentObjects;
   }
@@ -220,37 +222,38 @@ function balanceRest(theCoefficentObjects, theEquationsToSolve, i){
    return balanceRest(coefficentObjects2, equationsToSolve2, i+1);
 } //balance rest end
 
-let mapLCM = balance(putItIn);
-let arrLCM = lcmInput(mapLCM);
-let print = numsLCM(arrLCM);
-console.log(print);
+const finalValues = function(map, theLCM){
+   let arr = [];
+  for(let thing of map){
+    let str = '';
+    str += thing.value;
+    if(str.length > 1){
+      let strArr = str.split('/');
+      let fract = new Fraction(parseInt(strArr[0]),parseInt(strArr[1]));
+      arr.push(fract * theLCM);
+    } else{
+      arr.push(parseInt(thing.value * theLCM));
+    }
+  }
+  return arr;
+}
 
-
-function lcmInput(map){
+const lcmInput = function(map){
   let arr = [];
   for(let thing of map){
-    console.log(thing);
-    arr.push(thing.value);
+    let str = '';
+    str += thing.value;
+    let strArr = str.split('/');
+    if(strArr.length > 1){
+      arr.push(parseInt(strArr[1]));
+    }
   }
   return arr
 }
 
-function numsLCM(arr){
-  let newArr = [];
-  for(let i =0; i < arr.length; i++){
-    arr[i] = arr[i].toString();
-    if(arr[i].indexOf('/')){
-       newArr.push(parseInt(arr[i].split('/')[1]));
-    }
-  }
-  let theArr = removeDuplicates(newArr);
-  return theArr;
-}
-
-
 //////////////////////////////
 ////////////////////////////
-function solve(solveNext){
+const solve = function(solveNext){
   let lowerCaseRegex = /[a-z]/;
   let capitalRegex = /[A-Z]/;
   let numRegex = /[0-9]/;
@@ -270,7 +273,7 @@ function solve(solveNext){
   return answerMap;
 } //solve end
 
-function solveNext(equationsToSolve){
+const solveNext = function(equationsToSolve){
     let lowerCaseRegex = /[a-z]/;
   for(let equation of equationsToSolve){
     let letterCount = 0;
@@ -284,10 +287,10 @@ function solveNext(equationsToSolve){
      break;
     }
   } //foreach end
-}
+};
 
 
-function setCoefficentObjectOne(coefficentObjects, letter){
+const setCoefficentObjectOne = function(coefficentObjects, letter){
   for(let object of coefficentObjects){
     if(object.letter === letter){
       object.value = 1;
@@ -296,7 +299,7 @@ function setCoefficentObjectOne(coefficentObjects, letter){
   }
   return coefficentObjects;
 }
-function setCoefficentObjectValue(coefficentObjects, letter, value){
+const setCoefficentObjectValue = function(coefficentObjects, letter, value){
   for(let object of coefficentObjects){
     if(object.letter === letter){
       object.value = value;
@@ -305,10 +308,17 @@ function setCoefficentObjectValue(coefficentObjects, letter, value){
   }
   return coefficentObjects;
 }
+const findLCM = function(A) {
+    var n = A.length, a = Math.abs(A[0]);
+    for (var i = 1; i < n; i++){
+      var b = Math.abs(A[i]), c = a;
+       while (a && b){ a > b ? a %= b : b %= a; }
+       a = Math.abs(c*A[i])/(a+b);
+     }
+    return a;
+}
 
-
-function findFirstLetter(theMap){
-
+const findFirstLetter = function(theMap){
   let lowerCaseRegex = /[a-z]/;
   let found = false;
   let letters = [];
@@ -330,7 +340,7 @@ function findFirstLetter(theMap){
 }
 
 
-function setLetterToValue(equations, letter, value){
+const setLetterToValue = function(equations, letter, value){
   let lowerCaseRegex = /[a-z]/;
   let numRegex = /[0-9]/;
   let newEquations = [];
@@ -353,7 +363,7 @@ function setLetterToValue(equations, letter, value){
    return removeDuplicates(newEquations);
 }
 
-function setLetterToOne(equations, letter){
+const setLetterToOne = function(equations, letter){
   let lowerCaseRegex = /[a-z]/;
   let numRegex = /[0-9]/;
   let newEquations = [];
@@ -374,11 +384,11 @@ function setLetterToOne(equations, letter){
     newEquations.push(equation);
 
   }
-
    return removeDuplicates(newEquations);
 }
 
-function createCoefficentObjects(theMap){
+
+const createCoefficentObjects = function(theMap){
   let lowerCaseRegex = /[a-z]/;
   let equations = Object.values(theMap);
   let str = '';
@@ -393,10 +403,21 @@ function createCoefficentObjects(theMap){
     }
   } //for end
   return theCoefficents;
-}
+};
 
-
-function removeDuplicates(arr){
+const removeDuplicates = function(arr){
     let unique = [...new Set(arr)];
     return unique;
-}
+};
+
+
+let thingy = 'B5H9+O2=B2O3+H2O';
+let next = stringToJSON(thingy);
+let putItIn = createEquations(next);
+let mapLCM = balance(putItIn);
+console.log('below is map LCM ');
+console.log(mapLCM);
+let arrLCM = lcmInput(mapLCM);
+let theLCM = findLCM(arrLCM);
+let theNewValues=finalValues(mapLCM, theLCM);
+console.log(theNewValues);
