@@ -1,203 +1,27 @@
 //first replace a with 1
 //then find an equation with only one other letter and solve for that letter
 //then if one of the other equations contains the letter/ replace it with the answer
-var algebra = require('algebra.js');
-var Fraction = algebra.Fraction;
-var Expression = algebra.Expression;
-var Equation = algebra.Equation;
-// var molecule = require('classes').Molecule;
-// var ChemEquation= require('classes').ChemEquation;
-// var aCoefficent = require('classes').aCoefficent;
-// var Side = require('classes').Side;
+const algebra = require('algebra.js');
+const Fraction = algebra.Fraction;
+const Expression = algebra.Expression;
+const Equation = algebra.Equation;
+const Molecule = require('./classes').Molecule;
+const ChemEquation= require('./classes').ChemEquation;
+const aCoefficent = require('./classes').aCoefficent;
+const Side = require('./classes').Side;
+const stringToJSON = require('./stringToJSON').stringToJSON;
+const createCoefficentObjects = require('./balanceHelpers').createCoefficentObjects;
+const findFirstLetter = require('./balanceHelpers').findFirstLetter;
+const setLetterToOne = require('./balanceHelpers').setLetterToOne;
+const setLetterToValue = require('./balanceHelpers').setLetterToValue;
+const setCoefficentObjectOne = require('./balanceHelpers').setCoefficentObjectOne;
+const setCoefficentObjectValue = require('./balanceHelpers').setCoefficentObjectValue;
+const removeDuplicates = require('./balanceHelpers').removeDuplicates;
+const createEquations = require('./balanceHelpers').createEquations;
 
+ ///////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////////
 
-function Molecule(coefficent){
-  this.coefficent = coefficent;
-  this.atoms = [];
-};
-
-function Side(){
-  this.molecules = [];
-};
-
-function ChemEquation(reactants, products){
-  this.reactants = reactants;
-  this.products = products;
-};
-
-Side.prototype.addMolecule = function(object){
-  this.molecules.push(object);
-};
-
-Molecule.prototype.addAtom = function(name, subscript){
-  this.atoms.push({
-    name: name,
-    subscript: subscript
-  });
-};
-
-Molecule.prototype.contains = function(name){
-  for(let i = 0; i < this.atoms.length; i++){
-    if(this.atoms[i].name === name){
-      return true;
-      break;
-    }
-  }
-  return false;
-}
-
-function aCoefficent(letter){
-  this.letter = letter;
-  this.value = 0;
-  this.solved = false;
-}
-
-aCoefficent.prototype.solve = function(value){
-  this.value = value;
-  this.solved = true;
-}
-////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
-  //
- // let thingy = 'B5H9+O2=B2O3+H2O';
-// let thingy = 'Li+H3PO4=H2+Li3PO4';
-
-
-const stringToJSON = function(data){
-let sides = data.split("=");
-let leftMolecules = sides[0].split("+");
-let rightMolecules = sides[1].split("+");
-let coCount = 1;
-function sideToJSON(side){
-  let arr = [];
-   let theSide = new Side();
-
-   for(let molecule of side){
-    let capitalRegex = /[A-Z]/;
-    let lowerCaseRegex = /[a-z]/;
-    let numRegex = /[0-9]/;
-    let letter = num2Letter(coCount);
-    let theMolecule = new Molecule(letter);
-    coCount++;
-    let rest = molecule;
-
-    for(let j = 0; j<rest.length; j++){
-      //if the char is a capital letter
-      if(capitalRegex.test(rest[j]) === true){
-
-        //Capital LowerCase Number Number
-        if(lowerCaseRegex.test(rest[j+1]) === true && numRegex.test(rest[j+2]) === true && numRegex.test(rest[j+3]) === true){
-          let atom = '';
-          let subscript = '';
-          atom += rest[j];
-          atom += rest[j+1];
-          subscript+=rest[j+2];
-          subscript+=rest[j+3];
-          theMolecule.addAtom(atom, parseInt(subscript));
-
-          //Capital LowerCase Number
-        } else if(lowerCaseRegex.test(rest[j+1])===true && numRegex.test(rest[j+2]) === true){
-          let atom = '';
-          let subscript = '';
-          atom += rest[j];
-          atom += rest[j+1];
-          subscript+=rest[j+2];
-          theMolecule.addAtom(atom, parseInt(subscript));
-
-          //Capital Number Number
-        } else if(numRegex.test(rest[j+1]) === true && numRegex.test(rest[j+2]) === true){
-          let atom = '';
-          let subscript = '';
-          atom += rest[j];
-          subscript += rest[j+1];
-          subscript += rest[j+2];
-          theMolecule.addAtom(atom, parseInt(subscript));
-
-        //Capital LowerCase
-      } else if(lowerCaseRegex.test(rest[j+1])===true){
-            let atom = '';
-            atom += rest[j];
-            atom += rest[j+1];
-            theMolecule.addAtom(atom, 1);
-
-            //Capital Number
-         } else if(numRegex.test(rest[j+1])===true){
-           let atom = '';
-           let subscript = '';
-           atom+=rest[j];
-           subscript+= rest[j+1];
-           theMolecule.addAtom(atom, parseInt(subscript));
-
-        //Just a Capital on Its Own
-      } else {
-           let anAtom = rest[j];
-           theMolecule.addAtom(anAtom, 1);
-         }
-      }
-    }
-      theSide.addMolecule(theMolecule);
-    } //for molecule of side end
-    return theSide;
- } //sideToJSON end
-
- let reactants = sideToJSON(leftMolecules);
- let products = sideToJSON(rightMolecules);
- let equation = new ChemEquation(reactants, products);
- return equation;
-}
-
-// console.log(next);
-
-// switch statement
-
-const num2Letter = function(c){
-  switch(c){
-    case 1: return 'a';
-    case 2: return 'b';
-    case 3: return 'c';
-    case 4: return 'd';
-    case 5: return 'e';
-    case 6: return 'f';
-    case 7: return 'g';
-    case 8: return 'h';
-    case 9: return 'i';
-    case 10: return 'j';
-    default: return 0;
-  }
-}
- ///////////////////////////////////
- ///////////////////////////////////
-
-
-const createEquations = function(equation){
-   let map1 = createMap(equation.reactants);
-   let map2 = createMap(equation.products);
- for(let value in map1){
-   map1[value]+= '='+ map2[value];
- }
-   return map1;
- }
-
-const createMap = function(side){
-  let map = {};
-  for(let molecule of side.molecules){
-    let coefficent = molecule.coefficent;
-    for(let atom of molecule.atoms){
-          if(atom.name.includes('undefined')=== true){
-          atom.name = atom.name.substring(0, 1);
-           }
-      if(!map[atom.name]){
-        map[atom.name] = atom.subscript.toString() + coefficent;
-      } else {
-        map[atom.name] += '+' + atom.subscript.toString() + coefficent;
-      }
-    }
-  }
-  return map;
-}
-
-
-////////////////////////////////////
 
 const balance = function(map){
  let coefficentObjects = createCoefficentObjects(map);
@@ -214,7 +38,7 @@ const balanceRest = function(theCoefficentObjects, theEquationsToSolve, i){
   if(i === theCoefficentObjects.length -1){
     return theCoefficentObjects;
   }
- //this SHOULD Return and equation
+ // this SHOULD Return and equation
    equationToSolveNext = solveNext(theEquationsToSolve);
    let answer = solve(equationToSolveNext);
    let coefficentObjects2 = setCoefficentObjectValue(theCoefficentObjects, answer.letter, answer.value);
@@ -290,24 +114,6 @@ const solveNext = function(equationsToSolve){
 };
 
 
-const setCoefficentObjectOne = function(coefficentObjects, letter){
-  for(let object of coefficentObjects){
-    if(object.letter === letter){
-      object.value = 1;
-      object.solved = true;
-    }
-  }
-  return coefficentObjects;
-}
-const setCoefficentObjectValue = function(coefficentObjects, letter, value){
-  for(let object of coefficentObjects){
-    if(object.letter === letter){
-      object.value = value;
-      object.solved = true;
-    }
-  }
-  return coefficentObjects;
-}
 const findLCM = function(A) {
     var n = A.length, a = Math.abs(A[0]);
     for (var i = 1; i < n; i++){
@@ -318,106 +124,57 @@ const findLCM = function(A) {
     return a;
 }
 
-const findFirstLetter = function(theMap){
-  let lowerCaseRegex = /[a-z]/;
-  let found = false;
-  let letters = [];
-  let equations = Object.values(theMap);
-      while(found === false){
-      for(let equation of equations){
-         for(let i=0; i < equation.length; i++){
-           if(lowerCaseRegex.test(equation[i])===true){
-              letters.push(equation[i]);
-           }
-         }
-         if(letters.length < 3){
-           theLetter = letters[0];
-           found = true;
-         }
-         return theLetter;
-      } //foreach end
-    } //while end
-}
 
 
-const setLetterToValue = function(equations, letter, value){
-  let lowerCaseRegex = /[a-z]/;
-  let numRegex = /[0-9]/;
-  let newEquations = [];
-  for(equation of equations){
-    for(let i = 0; i < equation.length; i++){
-      if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
-          equation = equation.replace(letter, '*'+value+'*');
-         newEquations.push(equation);
-      } else if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===false){
-          equation = equation.replace(letter, '*' + value);
-      } else if(numRegex.test(equation[i])===false && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
-        equation = equation.replace(letter, value+'*');
-      } else {
-        equation.replace(letter, value);
-      }
+const setCoefficents = function(object, values){
+  console.log('this is the values array coming into the equation ' + values);
+  for(let side in object){
+    console.log('below is the side: ');
+    let molecules = object[side].molecules;
+    console.log('below should be the molecules '+ molecules );
+    for(let molecule of molecules){
+      console.log('this should be the coeficent on its own: ' + molecule.coefficent);
+      const answer = letterToIndex(values, molecule.coefficent);
+      molecule.coefficent = answer;
+      console.log('this is what we want to make the new coefficent ' + answer);
+      console.log('this is the coefficent changed ' + molecule.coefficent);
     }
-    newEquations.push(equation)
-
   }
-   return removeDuplicates(newEquations);
-}
 
-const setLetterToOne = function(equations, letter){
-  let lowerCaseRegex = /[a-z]/;
-  let numRegex = /[0-9]/;
-  let newEquations = [];
-  for(equation of equations){
 
-    for(let i = 0; i < equation.length; i++){
-      if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
-          equation = equation.replace(letter, '*1*');
-         newEquations.push(equation);
-      } else if(numRegex.test(equation[i])===true && equation[i+1]===letter && numRegex.test(equation[i+2])===false){
-          equation = equation.replace(letter, '*1');
-      } else if(numRegex.test(equation[i])===false && equation[i+1]===letter && numRegex.test(equation[i+2])===true){
-        equation = equation.replace(letter, '1*');
-      } else {
-        equation.replace(letter, '1');
-      }
+function letterToIndex(arr, letter){
+   console.log('this is the arr in the switch statement');
+   console.log(arr);
+   console.log('this is the letter coming in: ' + letter);
+   switch(letter){
+    case 'a': return arr[0];
+    case 'b': return arr[1];
+    case 'c': return arr[2];
+    case 'd': return arr[3];
+    case 'e': return arr[4];
+    case 'f': return arr[5];
+    case 'g': return arr[6];
+    case 'h': return arr[7];
+    case 'i': return arr[8];
     }
-    newEquations.push(equation);
-
   }
-   return removeDuplicates(newEquations);
 }
 
+const finalSolve = function(thingy){
+  let next = stringToJSON(thingy);
+  console.log('below is our equation object: ');
+  console.log(next);
+  let putItIn = createEquations(next);
+  console.log('below is the map to put it ');
+  console.log(putItIn);
+  let mapLCM = balance(putItIn);
+  let arrLCM = lcmInput(mapLCM);
+  let theLCM = findLCM(arrLCM);
+  let theNewValues=finalValues(mapLCM, theLCM);
+  let theNewEquation = setCoefficents(next, theNewValues);
+  console.log(theNewEquation);
+  return theNewValues;
+}
 
-const createCoefficentObjects = function(theMap){
-  let lowerCaseRegex = /[a-z]/;
-  let equations = Object.values(theMap);
-  let str = '';
-  let theCoefficents = [];
-  for(let equation of equations){
-    for(let i = 0; i < equation.length; i++){
-      if(lowerCaseRegex.test(equation[i])===true && str.includes(equation[i])===false){
-        let coefficent = new aCoefficent(equation[i]);
-        theCoefficents.push(coefficent);
-        str+=equation[i];
-      }
-    }
-  } //for end
-  return theCoefficents;
-};
-
-const removeDuplicates = function(arr){
-    let unique = [...new Set(arr)];
-    return unique;
-};
-
-
-let thingy = 'B5H9+O2=B2O3+H2O';
-let next = stringToJSON(thingy);
-let putItIn = createEquations(next);
-let mapLCM = balance(putItIn);
-console.log('below is map LCM ');
-console.log(mapLCM);
-let arrLCM = lcmInput(mapLCM);
-let theLCM = findLCM(arrLCM);
-let theNewValues=finalValues(mapLCM, theLCM);
-console.log(theNewValues);
+const toPrint = 'B5H9+O2=B2O3+H2O';
+console.log(finalSolve(toPrint));

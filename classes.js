@@ -2,6 +2,7 @@ class Molecule{
   constructor(coefficent){
     this.coefficent = coefficent;
     this.atoms = [];
+  }
     addAtom(name, subscript){
       this.atoms.push({
         name: name,
@@ -17,11 +18,12 @@ class Molecule{
       }
       return false;
     }
-  }
-};
+  };
 
-class Side(){
+class Side{
+  constructor(){
   this.molecules = [];
+ }
   addMolecule(object){
     this.molecules.push(object);
   }

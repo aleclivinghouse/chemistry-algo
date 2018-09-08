@@ -1,4 +1,10 @@
-module.exports = function stringToJSON(data){
+const Molecule = require('./classes').Molecule;
+const ChemEquation= require('./classes').ChemEquation;
+const aCoefficent = require('./classes').aCoefficent;
+const Side = require('./classes').Side;
+// const stringToJSON = require('./stringToJSON').stringToJSON;
+
+const stringToJSON = function(data){
 let sides = data.split("=");
 let leftMolecules = sides[0].split("+");
 let rightMolecules = sides[1].split("+");
@@ -81,8 +87,12 @@ function sideToJSON(side){
  return equation;
 }
 
+// console.log(next);
 
-function num2Letter(c){
+
+
+// switch statement
+const num2Letter = function(c){
   switch(c){
     case 1: return 'a';
     case 2: return 'b';
@@ -99,48 +109,7 @@ function num2Letter(c){
 }
 
 
-function Molecule(coefficent){
-  this.coefficent = coefficent;
-  this.atoms = [];
-};
 
-function Side(){
-  this.molecules = [];
-};
-
-function ChemEquation(reactants, products){
-  this.reactants = reactants;
-  this.products = products;
-};
-
-Side.prototype.addMolecule = function(object){
-  this.molecules.push(object);
-};
-
-Molecule.prototype.addAtom = function(name, subscript){
-  this.atoms.push({
-    name: name,
-    subscript: subscript
-  });
-};
-
-Molecule.prototype.contains = function(name){
-  for(let i = 0; i < this.atoms.length; i++){
-    if(this.atoms[i].name === name){
-      return true;
-      break;
-    }
-  }
-  return false;
-}
-
-function aCoefficent(letter){
-  this.letter = letter;
-  this.value = 0;
-  this.solved = false;
-}
-
-aCoefficent.prototype.solve = function(value){
-  this.value = value;
-  this.solved = true;
+module.exports = {
+  stringToJSON: stringToJSON
 }
