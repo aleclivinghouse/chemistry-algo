@@ -5,6 +5,7 @@ const algebra = require('algebra.js');
 const Fraction = algebra.Fraction;
 const Expression = algebra.Expression;
 const Equation = algebra.Equation;
+const periodicTable = require('./periodicTable').periodicTable;
 const Molecule = require('./classes').Molecule;
 const ChemEquation= require('./classes').ChemEquation;
 const aCoefficent = require('./classes').aCoefficent;
@@ -62,9 +63,13 @@ const finalValues = function(map, theLCM){
   return arr;
 }
 
-const lcmInput = function(map){
+//this needs to change to return an Object
+const lcmInput = function(mapArr){
+  mapArr.sort(dynamicSort("letter"))
+  console.log('below is the map sorted by letter');
+  console.log(mapArr);
   let arr = [];
-  for(let thing of map){
+  for(let thing of mapArr){
     let str = '';
     str += thing.value;
     let strArr = str.split('/');
@@ -73,6 +78,21 @@ const lcmInput = function(map){
     }
   }
   return arr
+}
+
+function dynamicSort(property) {
+    let sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        if(sortOrder == -1){
+            return b[property].localeCompare(a[property]);
+        }else{
+            return a[property].localeCompare(b[property]);
+        }
+    }
 }
 
 //////////////////////////////
@@ -127,7 +147,6 @@ const findLCM = function(A) {
 
 
 const setCoefficents = function(object, values){
-  console.log('this is the values array coming into the equation ' + values);
   for(let side in object){
     console.log('below is the side: ');
     let molecules = object[side].molecules;
@@ -139,6 +158,7 @@ const setCoefficents = function(object, values){
       console.log('this is what we want to make the new coefficent ' + answer);
       console.log('this is the coefficent changed ' + molecule.coefficent);
     }
+    return object;
   }
 
 
@@ -178,3 +198,21 @@ const finalSolve = function(thingy){
 
 const toPrint = 'B5H9+O2=B2O3+H2O';
 console.log(finalSolve(toPrint));
+
+const findAtomicMass = function(periodicTable, molecule){
+  const coefficent = molecule.coefficent;
+  let total = 0;
+  for(let atom of molecule["atoms"]){
+    let answer = periodTable[atom.name] * atom.subscript * coefficent;
+    total += answer;
+  }
+  return total;
+}
+
+//steps for stoichiometry
+//1.find the atomic mass of one mole the molecule that we know the amount of
+//we do this by adding up the atomic masses from the periodic table
+//2. divide the amount of the substance we have by the number we just found to get the number of moles that we have
+//3. multiply what we found by the coefficent of the molecule we don't have the amount of, this is how many moles we need
+//4. find the atomic mass for one mole of the molecule we dont know the amount of
+//5. multiply what we found in step 3 and four together
