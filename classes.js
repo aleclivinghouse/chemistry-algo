@@ -1,7 +1,8 @@
 class Molecule{
-  constructor(coefficent){
+  constructor(coefficent, weight){
     this.coefficent = coefficent;
     this.atoms = [];
+    this.weight = weight;
   }
     addAtom(name, subscript){
       this.atoms.push({
