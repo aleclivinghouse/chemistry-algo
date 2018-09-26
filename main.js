@@ -47,6 +47,8 @@ const balanceRest = function(theCoefficentObjects, theEquationsToSolve, i){
 } //balance rest end
 
 const finalValues = function(map, theLCM){
+  // console.log('this is theLCM coming into final values');
+  console.log(theLCM);
   //BUG this is not return numbers the way that it should
    let arr = [];
   for(let thing of map){
@@ -55,12 +57,12 @@ const finalValues = function(map, theLCM){
     if(str.length > 1){
       let strArr = str.split('/');
       let fract = new Fraction(parseInt(strArr[0]),parseInt(strArr[1]));
-      console.log('this is where the fraction gets created');
-      console.log(fract)
+      // console.log('this is where the fraction gets created');
+      // console.log(fract)
       arr.push(fract * theLCM);
     } else{
-      console.log('this is also where it could be breaking');
-      console.log(thing.value);
+      // console.log('this is also where it could be breaking');
+      // console.log(thing.value);
       arr.push(parseInt(thing.value) * parseInt(theLCM));
     }
   }
@@ -70,8 +72,8 @@ const finalValues = function(map, theLCM){
 //this needs to change to return an Object
 const lcmInput = function(mapArr){
   mapArr.sort(dynamicSort("letter"));
-  console.log('below is the map sorted by letter');
-  console.log(mapArr);
+  // console.log('below is the map sorted by letter');
+  // console.log(mapArr);
   let arr = [];
   for(let thing of mapArr){
     let str = '';
@@ -79,6 +81,8 @@ const lcmInput = function(mapArr){
     let strArr = str.split('/');
     if(strArr.length > 1){
       arr.push(parseInt(strArr[1]));
+    } else{
+      arr.push(parseInt(str));
     }
   }
   return arr
@@ -149,18 +153,18 @@ const findLCM = function(A) {
 }
 
 const setCoefficents = function(object, values){
-  console.log('these are the values coming into setCoefficents');
-  console.log(values);
+  // console.log('these are the values coming into setCoefficents');
+  // console.log(values);
   for(let side in object){
-    console.log('below is the side: ');
+    // console.log('below is the side: ');
     let molecules = object[side].molecules;
-    console.log('below should be the molecules '+ molecules );
+    // console.log('below should be the molecules '+ molecules );
     for(let molecule of molecules){
-      console.log('this should be the coeficent on its own: ' + molecule.coefficent);
+      // console.log('this should be the coeficent on its own: ' + molecule.coefficent);
       const answer = letterToIndex(values, molecule.coefficent);
       molecule.coefficent = answer;
-      console.log('this is what we want to make the new coefficent ' + answer);
-      console.log('this is the coefficent changed ' + molecule.coefficent);
+      // console.log('this is what we want to make the new coefficent ' + answer);
+      // console.log('this is the coefficent changed ' + molecule.coefficent);
     }
   }
   return object;
@@ -187,8 +191,8 @@ function letterToIndex(arr, letter){
 //{}
 //put in weight
 
-const finalSolve = function(thingy, weight){
-  let next = stringToJSON(thingy, weight);
+const finalSolve = function(thingy, weights){
+  let next = stringToJSON(thingy, weights);
   // console.log('below is our equation object: ');
   // console.log(next);
   let putItIn = createEquations(next);
@@ -198,84 +202,131 @@ const finalSolve = function(thingy, weight){
   let arrLCM = lcmInput(mapLCM);
   let theLCM = findLCM(arrLCM);
   let theNewValues=finalValues(mapLCM, theLCM);
-  console.log('these are the new values');
-  console.log(theNewValues);
+  // console.log('these are the new values');
+  // console.log(theNewValues);
   let theNewEquation = setCoefficents(next, theNewValues);
-  console.log(theNewValues);
+  // console.log(theNewValues);
   // return theNewValues;
-  console.log('below is the equation we are returning  in final solve');
-  console.log(theNewEquation);
+  // console.log('below is the equation we are returning  in final solve');
+  // console.log(theNewEquation);
   return theNewEquation;
 }
 
-const doStoich = function(equation, weight, periodicTable){
-  console.log('below is the equation coming into doStoich');
-  console.log(equation);
-  const molesOfFirst = getMoleAmountofFirst(equation, weight, periodicTable);
-  const molesOfSecond = getMoleAmountForSecond(equation, molesOfFirst, periodicTable);
-  console.log('this should be moles of first');
-  console.log(molesOfFirst);
-  console.log('this should be moles of the second');
-  console.log(molesOfSecond);
-  return molesOfFirst;
-}
+// const doStoich = function(equation, weight, periodicTable){
+//   console.log('below is the equation coming into doStoich');
+//   console.log(equation);
+//   const molesOfLimitingReagant = getMoleAmountofFirst(equation, weight, periodicTable);
+//   const final = getMoleAmount(equation, molesOfLimitingReagant, periodicTable);
+//   console.log(final);
+// }
+//
 
-const getMoleAmountForSecond = function(equation, molesOfFirst, periodicTable){
+// console.log('below is the equation coming in');
+// console.log(equation);
+// console.log('this is the totalcount coming into get mole amount  ' + totalCount);
+//  console.log('this is the count coming into get mole amount  ' +  count);
+ const getMoleAmount = function(equation, periodicTable, totalCount, count = 0){
+
+   console.log('below is the equation coming in');
+   console.log(equation);
+   console.log('this is the totalcount coming into get mole amount  ' + totalCount);
+    console.log('this is the count coming into get mole amount  ' +  count);
+    let weightsArray = [];
+  if(count === totalCount){
+    console.log('this is the weights array');
+    console.log(weightsArray);
+    return equation;
+  } else {
   let inMoles;
   let answer;
+  let newEquation;
+  let molesOfFirst;
+  let flag = false;
+  let coefficentOfFirst;
+  let coefficentOfSecond;
+  let howManyMolesOfSecond;
+  let massOfSecond;
   for(let side in equation){
-    let flag = false;
-    let coefficentOfFirst;
-    let coefficentOfSecond;
-    let howManyMolesOfSecond;
-    let massOfSecond;
     for(let molecule of equation[side].molecules){
       if(molecule.weight !== null){
         flag = true;
         coefficentOfFirst = molecule.coefficent;
+        let oneMole = findAtomicMass(periodicTable, molecule);
+        molesOfFirst = weight.amount/oneMole;
       }
     }
     for(let molecule of equation[side].molecules){
       if(molecule.weight === null && flag === true){
-
         coefficentOfSecond = molecule.coefficent;
         let ratio = new Fraction(coefficentOfSecond, coefficentOfFirst);
         howManyMolesOfSecond = molesOfFirst * ratio;
         massOfSecond = findAtomicMass(periodicTable, molecule);
         answer = howManyMolesOfSecond *  massOfSecond;
+        molecule.weight = answer;
+        // newEquation = equation;
       }
+      console.log('this is the answer ' + answer);
+      console.log('this is the weight ' + molecule.weight);
+      console.log('this is the count ' + count);
+      weightsArray.push(molecule.weight);
     }
   }
-  return answer;
+  let newCount = count+1;
+  return getMoleAmount(equation, periodicTable, totalCount, newCount);
+   }
+ } //this is the end
+
+const getTotalCount = function(equation){
+  let count = 0;
+  for(let side in equation){
+      for(let molecule of equation[side].molecules){
+        count++;
+      }
+  }
+  return count;
+}
+// let theWeight = {};
+// theWeight.amount = 85;
+// theWeight.moleCount = 1;
+const solveStoich = function(equation, periodicTable, weights, counts){
+  // console.log('below is the equation coming into solveStoich');
+  // console.log(equation);
+  let answers = [];
+  const totalCount  = getTotalCount(equation);
+  for(let weight in weights){
+    // let first = getMoleAmountOfFirst(equation, weight, periodicTable);
+    let rest = getMoleAmount(equation, periodicTable, counts);
+    // console.log('below is the new equation with the weights assigned');
+    // console.log(rest);
+    answers.push(rest);
+  }
+
+  //get the answer with the smallest number of weight;
+  return answers;
 }
 
-const getMoleAmountofFirst = function(equation, weight, periodicTable){
-  console.log('this is coming into getMoleAmountofFirst');
-  console.log(equation);
-  let inMoles;
-  for(let side in equation){
-    for(let molecule of equation[side].molecules){
-      // console.log('below is the molecule in getMoleofFirst');
-      // console.log(molecule);
-      if(molecule.weight !== null){
-        let oneMole = findAtomicMass(periodicTable, molecule);
-        console.log('this is one mole ');
-        console.log(oneMole)
-        inMoles = weight.amount/oneMole;
-      }
-    }
-  }
-  return inMoles;
-}
+
+// const getMoleAmountOfFirst = (equation, weight, periodicTable)=>{
+//   let inMoles;
+//   for(let side in equation){
+//     for(let molecule of equation[side].molecules){
+//       if(molecule.weight !== null){
+//         let oneMole = findAtomicMass(periodicTable, molecule);
+//         inMoles = weight.amount/oneMole;
+//       }
+//     }
+//   }
+//   return inMoles;
+// }
 
 const findAtomicMass = function(periodicTable, molecule){
   //BUG the molecule coming in is just a zero
-  console.log('below is the molecule coming in');
-  console.log(molecule);
+  // console.log('below is the molecule coming in');
+  // console.log(molecule);
   const coefficent = molecule.coefficent;
   const atoms = molecule.atoms;
-  console.log('below are the atoms');
-  console.log(atoms);
+  // console.log('below are the atoms');
+  // console.log(atoms);
   let total = 0;
   for(let atom of atoms){
     let answer = periodicTable[atom.name] * atom.subscript;
@@ -286,15 +337,21 @@ const findAtomicMass = function(periodicTable, molecule){
 
 
 
-
-let theWeight = {};
-theWeight.amount = 56;
-theWeight.moleCount = 1;
+let weight = {};
+weight.amount = 85;
+weight.moleCount = 1;
+let theWeight = [];
+theWeight.push(weight);
 console.log(theWeight.moleCount);
 // const toPrint = 'B5H9+O2=B2O3+H2O';
 const toPrint = 'Fe2O3+Al=Al2O3+Fe';
 const toStoich = finalSolve(toPrint, theWeight, periodicTable);
-const finalAnswerStoich = doStoich(toStoich, theWeight, periodicTable);
+console.log('this is the call of toStocih');
+console.log(toStoich);
+const theCount = getTotalCount(toStoich);
+console.log('this is the total count')
+console.log(theCount);
+const finalAnswerStoich = solveStoich(toStoich, periodicTable, theWeight, theCount);
 
 console.log('this is our answer');
 console.log(finalAnswerStoich);
@@ -307,3 +364,19 @@ console.log(finalAnswerStoich);
 //3. multiply what we found by the coefficent of the molecule we don't have the amount of, this is how many moles we need
 //4. find the atomic mass for one mole of the molecule we dont know the amount of
 //5. multiply what we found in step 3 and four together
+
+
+//WHAT WE NEED TO DO:
+//get the limiting reagant
+//then solve each one recursively
+
+
+
+//https://chem.libretexts.org/Textbook_Maps/Inorganic_Chemistry/Supplemental_Modules_(Inorganic_Chemistry)/Chemical_Reactions/Limiting_Reagents
+//To find the limiting reagent
+//DETAIL you are given the weight of two reactants and you need to find the value of the limiting reagant
+//find how many moles of each of the reactants you have
+//calculate the mole ratio of the two reactants
+//compare the molar ratio to the actual ratio
+//the one where theres less is the limiting reagant
+//use the ratio of the limiting reagant to fidn the value of the product
