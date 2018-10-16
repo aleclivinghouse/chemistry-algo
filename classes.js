@@ -35,6 +35,8 @@ class ChemEquation{
     this.reactants = reactants;
     this.products = products;
   }
+  
+
 };
 
 

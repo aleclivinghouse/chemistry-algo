@@ -22,7 +22,7 @@ function sideToJSON(side, weight){
     let letter = num2Letter(coCount);
     let theMolecule;
     for(let weight of weights){
-    if(coCount === weight.moleCount){
+    if(coCount === weight.whichMolecule){
       theMolecule = new Molecule(letter, weight.amount);
       console.log(theMolecule.weight);
     } else {
