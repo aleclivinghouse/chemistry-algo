@@ -4,9 +4,9 @@ const aCoefficent = require('./classes').aCoefficent;
 const Side = require('./classes').Side;
 // const stringToJSON = require('./stringToJSON').stringToJSON;
 
-const stringToJSON = function(data, weights){
+const stringToJSON = function(data, weight){
 console.log('below is the weight ');
-console.log(weights);
+console.log(weight);
 let sides = data.split("=");
 let leftMolecules = sides[0].split("+");
 let rightMolecules = sides[1].split("+");
@@ -21,14 +21,14 @@ function sideToJSON(side, weight){
     let numRegex = /[0-9]/;
     let letter = num2Letter(coCount);
     let theMolecule;
-    for(let weight of weights){
+    // for(let weight of weights){
     if(coCount === weight.whichMolecule){
       theMolecule = new Molecule(letter, weight.amount);
       console.log(theMolecule.weight);
     } else {
       theMolecule = new Molecule(letter, null);
       }
-    }
+    // }
 
     coCount++;
     let rest = molecule;
@@ -92,8 +92,8 @@ function sideToJSON(side, weight){
     return theSide;
  } //sideToJSON end
 
- let reactants = sideToJSON(leftMolecules, weights);
- let products = sideToJSON(rightMolecules, weights);
+ let reactants = sideToJSON(leftMolecules, weight);
+ let products = sideToJSON(rightMolecules, weight);
  let equation = new ChemEquation(reactants, products);
  return equation;
 }
